@@ -9,7 +9,6 @@ pub mod attacks;
 pub mod magic_numbers;
 
 pub static mut SLIDER_ATTACKS: [Bitboard; SLIDER_TABLE_SIZE] = [0; SLIDER_TABLE_SIZE];
-
 pub static mut BISHOP_TABLE: [Magic; 64] = [Magic {
     mask: 0,
     magic: 0,
@@ -27,6 +26,7 @@ pub static mut KING_TABLE: [Bitboard; 64] = [0; 64];
 pub static mut PAWN_WHITE_TABLE: [Bitboard; 64] = [0; 64];
 pub static mut PAWN_BLACK_TABLE: [Bitboard; 64] = [0; 64];
 
+/// Initialize all attack tables for quick lookups
 pub fn init_tables() {
     let mut offset = 0;
 
@@ -44,6 +44,7 @@ pub fn init_tables() {
     }
 }
 
+/// Looks up slider attacks in the precomputed table
 pub fn lookup_slider_att(square: u8, occupancy: Bitboard, bishop: bool) -> Bitboard {
     if square > 63 {
         return 0;
@@ -67,26 +68,32 @@ pub fn lookup_slider_att(square: u8, occupancy: Bitboard, bishop: bool) -> Bitbo
     unsafe { SLIDER_ATTACKS[offset + hash_index] }
 }
 
+/// Looks up bishop attacks in the precomputed attack table
 pub fn lookup_bishop_att(square: u8, occupancy: Bitboard) -> Bitboard {
     lookup_slider_att(square, occupancy, true)
 }
 
+/// Looks up rook attacks in the precomputed attack table
 pub fn lookup_rook_att(square: u8, occupancy: Bitboard) -> Bitboard {
     lookup_slider_att(square, occupancy, false)
 }
 
+/// Looks up queen attacks in the precomputed attack table
 pub fn lookup_queen_att(square: u8, occupancy: Bitboard) -> Bitboard {
     lookup_bishop_att(square, occupancy) | lookup_rook_att(square, occupancy)
 }
 
+/// Looks up king attacks in the precomputed attack table
 pub fn lookup_king_att(square: u8) -> Bitboard {
     unsafe { KING_TABLE[square as usize] }
 }
 
+/// Looks up knight attacks in the precomputed attack table
 pub fn lookup_knight_att(square: u8) -> Bitboard {
     unsafe { KNIGHT_TABLE[square as usize] }
 }
 
+/// Looks up pawn attacks in the precomputed attack table
 pub fn lookup_pawn_att(square: u8, color: Color) -> Bitboard {
     let table = unsafe {
         match color {

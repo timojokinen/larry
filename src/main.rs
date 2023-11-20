@@ -3,7 +3,7 @@ mod castling_rights;
 mod fen;
 mod util;
 
-use attacks::{attacks::pawn_att, init_tables};
+use attacks::{attacks::pawn_west_att, init_tables};
 use util::*;
 
 fn main() {
@@ -16,5 +16,6 @@ fn main() {
 
     init_tables();
 
-    print_bitboard(pawn_att(8, Color::Black));
+    print_bitboard(pawn_west_att(13, Color::White));
+    print_bitboard(pawn_west_att(13, Color::Black));
 }

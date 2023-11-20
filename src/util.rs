@@ -13,26 +13,32 @@ pub const FILE: u64 = 0x0101010101010101;
 pub const MAIN_DIAG: u64 = 0x8040201008040201;
 pub const ANTI_DIAG: u64 = 0x0102040810204080;
 
+/// Translate chess board coordinates to a square index (0 - 63)
 pub fn coord_to_idx(file: u8, rank: u8) -> u8 {
     8 * rank + file
 }
 
+/// Translate the index of a square to the corresponding file index (0-7)
 pub fn sq_to_file(square: u8) -> u8 {
     square & 7
 }
 
+/// Translate the index of a square to the corresponding rank index (0-7)
 pub fn sq_to_rank(square: u8) -> u8 {
     square >> 3
 }
 
+/// Masks the rank of a given square
 pub fn mask_rank(square: u8) -> Bitboard {
     RANK << (square & !7)
 }
 
+/// Masks the file of a given square
 pub fn mask_file(square: u8) -> Bitboard {
     FILE << (square & 7)
 }
 
+/// Masks the diagonal of a given square
 pub fn mask_diag(square: u8) -> Bitboard {
     let mut bb = MAIN_DIAG;
     let rank = sq_to_rank(square);
@@ -45,6 +51,7 @@ pub fn mask_diag(square: u8) -> Bitboard {
     bb
 }
 
+/// Masks the anti-diagonal of a given square
 pub fn mask_anti_diag(square: u8) -> Bitboard {
     let mut bb: u64 = ANTI_DIAG;
     let rank = sq_to_rank(square);
@@ -58,15 +65,18 @@ pub fn mask_anti_diag(square: u8) -> Bitboard {
     bb
 }
 
+/// Returns a Bitboard that represents the edges of the board, excluding the rank and file of the given square.
 pub fn edges(square: u8) -> Bitboard {
     ((mask_file(0) | mask_file(63)) & !mask_file(square))
         | ((mask_rank(0) | mask_rank(63)) & !mask_rank(square))
 }
 
-pub fn pop_bit(n: &mut u64, bit: u32) {
-    *n &= !(1 << bit);
+/// Unsets the bit at the given index
+pub fn pop_bit(n: &mut u64, idx: u32) {
+    *n &= !(1 << idx);
 }
 
+/// Translates a mailbox representation to a bitboard for a given piece
 pub fn mailbox_to_bitboard(mailbox: [Option<Piece>; 64], piece: Piece) -> Bitboard {
     let mut bitboard: Bitboard = 0;
 
@@ -79,6 +89,7 @@ pub fn mailbox_to_bitboard(mailbox: [Option<Piece>; 64], piece: Piece) -> Bitboa
     bitboard
 }
 
+/// Formats a bitboard in a pretty way for debugging
 pub fn format_bitboard(bitboard: Bitboard) -> String {
     let mut board_str = String::new();
     for row in (0..8).rev() {
@@ -97,6 +108,7 @@ pub fn format_bitboard(bitboard: Bitboard) -> String {
     board_str
 }
 
+/// Prints pretty bitboard for debugging
 pub fn print_bitboard(bitboard: Bitboard) {
     println!("{}", format_bitboard(bitboard));
 }

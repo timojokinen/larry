@@ -14,38 +14,44 @@ pub fn hyperbola_quintessence(piece: Bitboard, occupancy: Bitboard, mask: Bitboa
     (forward ^ reverse) & mask
 }
 
+/// Calculates bishop attacks on diag and anti-diag, taking into account the occupancy
 pub fn bishop_att(square: u8, occupancy: Bitboard) -> Bitboard {
     let piece = 1 << square;
     hyperbola_quintessence(piece, occupancy, mask_diag(square))
         | hyperbola_quintessence(piece, occupancy, mask_anti_diag(square))
 }
 
+/// Calculates rook attacks on diag and anti-diag, taking into account the occupancy
 pub fn rook_att(square: u8, occupancy: Bitboard) -> Bitboard {
     let piece = 1 << square;
     hyperbola_quintessence(piece, occupancy, mask_file(square))
         ^ hyperbola_quintessence(piece, occupancy, mask_rank(square))
 }
 
+/// Calculates pseudo-legal pawn attacks in east direction from the perspective of the white player
 pub fn pawn_east_att(square: u8, color: Color) -> Bitboard {
     let occ = 1u64 << square;
     match color {
         Color::White => (occ << 9) & !mask_file(0),
-        Color::Black => (occ >> 9) & !mask_file(63),
+        Color::Black => (occ >> 7) & !mask_file(63),
     }
 }
 
+/// Calculates pseudo-legal pawn attacks in west direction from the perspective of the white player
 pub fn pawn_west_att(square: u8, color: Color) -> Bitboard {
     let occ = 1u64 << square;
     match color {
         Color::White => (occ << 7) & !mask_file(63),
-        Color::Black => (occ >> 7) & !mask_file(0),
+        Color::Black => (occ >> 9) & !mask_file(0),
     }
 }
 
+/// Calculates pseudo-legal pawn attacks
 pub fn pawn_att(square: u8, color: Color) -> Bitboard {
     pawn_east_att(square, color) | pawn_west_att(square, color)
 }
 
+/// Calculates pseudo-legal king attacks in all directions
 pub fn king_att(square: u8) -> Bitboard {
     let occupancy = 1u64 << square;
     let mut att = 0u64;
@@ -81,6 +87,7 @@ pub fn king_att(square: u8) -> Bitboard {
     att
 }
 
+/// Calculates pseudo-legal knight attacks in all directions
 pub fn knight_att(square: u8) -> Bitboard {
     let occupancy = 1u64 << square;
 
@@ -99,7 +106,6 @@ pub fn knight_att(square: u8) -> Bitboard {
     } else {
         0
     };
-
     att |= if file > 1 && rank < 7 {
         occupancy << 6
     } else {
@@ -110,7 +116,6 @@ pub fn knight_att(square: u8) -> Bitboard {
     } else {
         0
     };
-
     att |= if rank > 0 && file < 6 {
         occupancy >> 6
     } else {
@@ -121,7 +126,6 @@ pub fn knight_att(square: u8) -> Bitboard {
     } else {
         0
     };
-
     att |= if rank > 1 && file < 7 {
         occupancy >> 15
     } else {
@@ -132,7 +136,6 @@ pub fn knight_att(square: u8) -> Bitboard {
     } else {
         0
     };
-
     att
 }
 

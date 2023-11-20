@@ -19,6 +19,7 @@ impl From<usize> for Color {
     }
 }
 
+/// Piece representation as integer
 #[derive(PartialEq, Copy, Clone)]
 pub enum Piece {
     PawnWhite = 0,
@@ -38,6 +39,7 @@ pub enum Piece {
 impl Piece {
     const PIECE_CHARS: [char; 12] = ['P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k'];
 
+    /// Creates a piece from the corresponding character
     pub fn from_char(ch: char) -> Option<Self> {
         match ch {
             'P' => Some(Piece::PawnWhite),
@@ -55,12 +57,9 @@ impl Piece {
             _ => None,
         }
     }
-
-    pub fn to_int(self) -> u8 {
-        self as u8
-    }
 }
 
+/// Translates the Standard Algebraic Notation of a square on the board to the corresponding index (0-63)
 pub fn san_to_int(san: &str) -> Option<u8> {
     if san.len() != 2 {
         return None;
@@ -79,6 +78,7 @@ pub fn san_to_int(san: &str) -> Option<u8> {
     Some((rank_value - 1) * 8 + file_value)
 }
 
+/// Translates an Edward-Forsyth-Notation to a full board state
 pub fn parse_fen(fen: &str) -> Result<BoardState, &str> {
     let mut parts = fen.splitn(6, " ");
 

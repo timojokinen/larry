@@ -2,6 +2,7 @@ use rand::Rng;
 
 use crate::{attacks::*, util::*};
 
+/// 
 pub const SLIDER_TABLE_SIZE: usize = 107648;
 
 #[derive(Debug, Copy, Clone)]
@@ -12,13 +13,18 @@ pub struct Magic {
     pub(super) offset: usize,
 }
 
+/// Calculates a magic number
 pub fn init_magic(
     square: u8,
     bishop: bool,
     offset: &mut usize,
     table: &mut [Bitboard; SLIDER_TABLE_SIZE],
 ) -> Magic {
-    let slider_attacks = if bishop { attacks::bishop_att } else { attacks::rook_att };
+    let slider_attacks = if bishop {
+        attacks::bishop_att
+    } else {
+        attacks::rook_att
+    };
     let attack_mask = slider_attacks(square, 0) & !edges(square);
 
     let relevant_bits = attack_mask.count_ones() as u8;
@@ -79,14 +85,19 @@ pub fn init_magic(
     }
 }
 
+/// Uses a magic number to calculate the index for the given occupancy in the precomputed table
 pub fn calculate_hash_index(magic: u64, occupancy: Bitboard, shift: u8) -> usize {
     (((occupancy.wrapping_mul(magic)) >> shift) as u64) as usize
 }
 
+/// Verifies if a magic number candidate is suitable by checking if the multiplication
+/// of the attack mask and the magic number results in at least 6 set bits in the upper byte.
 pub fn verify_candidate(magic: u64, attack_mask: Bitboard) -> bool {
     (attack_mask.wrapping_mul(magic) & 0xff00000000000000).count_ones() >= 6
 }
 
+/// Uses the Carry-Rippler trick to enumerate all different subset possibilities of a given binary number.
+/// Formula: (n - d) & d
 pub fn enumerate_subsets<F>(bitboard: Bitboard, mut func: F)
 where
     F: FnMut(u64, usize),
@@ -104,6 +115,7 @@ where
     }
 }
 
+/// Pre-calculated magic numbers for bishops to speed up initialising attack tables
 pub static BISHOP_MAGICS: [u64; 64] = [
     18041904302786592,
     4620698732480989544,
@@ -170,6 +182,8 @@ pub static BISHOP_MAGICS: [u64; 64] = [
     11540544423311180048,
     577026244912120065,
 ];
+
+/// Pre-calculated magic numbers for rooks to speed up initialising attack tables
 pub static ROOK_MAGICS: [u64; 64] = [
     9259401384170618904,
     2684154449420619777,
