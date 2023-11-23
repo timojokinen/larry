@@ -1,4 +1,4 @@
-use crate::fen::Piece;
+use crate::fen::{Piece, Squares};
 
 pub type Bitboard = u64;
 
@@ -77,7 +77,7 @@ pub fn pop_bit(n: &mut u64, idx: u32) {
 }
 
 /// Translates a mailbox representation to a bitboard for a given piece
-pub fn mailbox_to_bitboard(mailbox: [Option<Piece>; 64], piece: Piece) -> Bitboard {
+pub fn mailbox_to_bb(mailbox: Squares, piece: Piece) -> Bitboard {
     let mut bitboard: Bitboard = 0;
 
     for (idx, p) in mailbox.iter().enumerate() {

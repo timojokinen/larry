@@ -1,12 +1,17 @@
 use crate::{castling_rights::CastlingRights, util::Color};
 
+pub type Squares = [Option<Piece>; 64];
+pub type EnPassantSquare = Option<u8>;
+pub type HalfMoveClock = usize;
+pub type FullMoveNumber = usize;
+
 pub struct BoardState(
-    [Option<Piece>; 64],
-    Color,
-    CastlingRights,
-    Option<u8>,
-    usize,
-    usize,
+    pub Squares,
+    pub Color,
+    pub CastlingRights,
+    pub EnPassantSquare,
+    pub HalfMoveClock,
+    pub FullMoveNumber,
 );
 
 impl From<usize> for Color {
@@ -37,7 +42,7 @@ pub enum Piece {
 }
 
 impl Piece {
-    const PIECE_CHARS: [char; 12] = ['P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k'];
+    pub const PIECE_CHARS: [char; 12] = ['P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k'];
 
     /// Creates a piece from the corresponding character
     pub fn from_char(ch: char) -> Option<Self> {
