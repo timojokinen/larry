@@ -1,6 +1,6 @@
 use crate::{
     fen::{parse_fen, BoardState, Piece},
-    util::{mailbox_to_bb, Bitboard},
+    util::{mailbox_to_bb, Bitboard, Color},
 };
 
 pub struct Position {
@@ -21,6 +21,33 @@ impl From<&str> for Position {
         Self {
             pieces,
             board_state: parsed_fen,
+        }
+    }
+}
+
+impl Position {
+    pub fn generate_pawn_moves() {}
+
+    pub fn all_pieces_bb(&self, color: Option<Color>) -> Bitboard {
+        match color {
+            Some(Color::White) => {
+                let mut bb = 0u64;
+                for idx in 0usize..6 {
+                    bb |= self.pieces[idx]
+                }
+                bb
+            }
+            Some(Color::Black) => {
+                let mut bb = 0u64;
+                for idx in 6usize..12 {
+                    bb |= self.pieces[idx]
+                }
+                bb
+            }
+            _ => {
+                Self::all_pieces_bb(&self, Some(Color::White))
+                    | Self::all_pieces_bb(&self, Some(Color::Black))
+            }
         }
     }
 }

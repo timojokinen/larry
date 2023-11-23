@@ -89,6 +89,29 @@ pub fn mailbox_to_bb(mailbox: Squares, piece: Piece) -> Bitboard {
     bitboard
 }
 
+/// Returns the opposite color
+pub fn opp(color: Color) -> Color {
+    (color as usize ^ 1).into()
+}
+
+/// Iterate over all bits set in the given bitboard
+pub fn iterate_bits<F>(bb: Bitboard, func: F)
+where
+    F: Fn(u32),
+{
+    let _bb: &mut Bitboard = &mut bb.clone();
+
+    loop {
+        let lsb1idx = _bb.trailing_zeros();
+        func(lsb1idx);
+        pop_bit(_bb, lsb1idx);
+
+        if *_bb == 0 {
+            break;
+        }
+    }
+}
+
 /// Formats a bitboard in a pretty way for debugging
 pub fn format_bitboard(bitboard: Bitboard) -> String {
     let mut board_str = String::new();
