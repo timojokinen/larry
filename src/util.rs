@@ -3,13 +3,32 @@ use crate::fen::{Piece, Squares};
 pub type Bitboard = u64;
 
 #[derive(PartialEq, Clone, Copy)]
+#[repr(u8)]
 pub enum Color {
     White = 0,
     Black = 1,
 }
 
-pub const RANK: u64 = 0xff;
-pub const FILE: u64 = 0x0101010101010101;
+pub const RANKS: [u64; 8] = [
+    0xff,
+    0xff00,
+    0xff0000,
+    0xff000000,
+    0xff00000000,
+    0xff0000000000,
+    0xff000000000000,
+    0xff00000000000000,
+];
+
+pub const FILE_1: u64 = 0x0101010101010101;
+pub const FILE_2: u64 = 0x202020202020202;
+pub const FILE_3: u64 = 0x404040404040404;
+pub const FILE_4: u64 = 0x808080808080808;
+pub const FILE_5: u64 = 0x1010101010101010;
+pub const FILE_6: u64 = 0x2020202020202020;
+pub const FILE_7: u64 = 0x4040404040404040;
+pub const FILE_8: u64 = 0x8080808080808080;
+
 pub const MAIN_DIAG: u64 = 0x8040201008040201;
 pub const ANTI_DIAG: u64 = 0x0102040810204080;
 
@@ -30,12 +49,12 @@ pub fn sq_to_rank(square: u8) -> u8 {
 
 /// Masks the rank of a given square
 pub fn mask_rank(square: u8) -> Bitboard {
-    RANK << (square & !7)
+    RANKS[0] << (square & !7)
 }
 
 /// Masks the file of a given square
 pub fn mask_file(square: u8) -> Bitboard {
-    FILE << (square & 7)
+    FILE_1 << (square & 7)
 }
 
 /// Masks the diagonal of a given square
@@ -71,8 +90,21 @@ pub fn edges(square: u8) -> Bitboard {
         | ((mask_rank(0) | mask_rank(63)) & !mask_rank(square))
 }
 
+// Returns the bitboard mask of a rank on the board relative to the given color
+pub fn relative_rank(rank: u8, color: Color) -> Bitboard {
+    if color == Color::White {
+        RANKS[rank as usize]
+    } else {
+        RANKS[7 - rank as usize]
+    }
+}
+
+pub fn bb_from_square(square: u8) -> Bitboard {
+    1u64.checked_shl(square.into()).unwrap_or(0)
+}
+
 /// Unsets the bit at the given index
-pub fn pop_bit(n: &mut u64, idx: u32) {
+pub fn pop_bit(n: &mut u64, idx: u8) {
     *n &= !(1 << idx);
 }
 
@@ -89,26 +121,29 @@ pub fn mailbox_to_bb(mailbox: Squares, piece: Piece) -> Bitboard {
     bitboard
 }
 
+pub fn is_on_board(square: u8) -> bool {
+    square < 64
+}
+
 /// Returns the opposite color
 pub fn opp(color: Color) -> Color {
     (color as usize ^ 1).into()
 }
 
 /// Iterate over all bits set in the given bitboard
-pub fn iterate_bits<F>(bb: Bitboard, func: F)
+pub fn enumerate_bits<F>(bb: Bitboard, mut func: F)
 where
-    F: Fn(u32),
+    F: FnMut(u8),
 {
     let _bb: &mut Bitboard = &mut bb.clone();
 
     loop {
-        let lsb1idx = _bb.trailing_zeros();
+        if *_bb == 0 {
+            return;
+        };
+        let lsb1idx = _bb.trailing_zeros() as u8;
         func(lsb1idx);
         pop_bit(_bb, lsb1idx);
-
-        if *_bb == 0 {
-            break;
-        }
     }
 }
 
@@ -186,5 +221,11 @@ mod tests {
         assert!(bb == 0b1011);
         pop_bit(&mut bb, 0);
         assert!(bb == 0b1010);
+    }
+
+    #[test]
+    fn calculate_opponent_color_correctly() {
+        assert!(opp(Color::White) == Color::Black);
+        assert!(opp(Color::Black) == Color::White);
     }
 }
