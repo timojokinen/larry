@@ -26,6 +26,7 @@ impl From<usize> for Color {
 
 /// Piece representation as integer
 #[derive(PartialEq, Copy, Clone)]
+#[repr(u8)]
 pub enum Piece {
     PawnWhite = 0,
     KnightWhite = 1,
@@ -42,7 +43,8 @@ pub enum Piece {
 }
 
 impl Piece {
-    pub const PIECE_CHARS: [char; 12] = ['P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k'];
+    pub const PIECE_CHARS: [char; 12] =
+        ['P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k'];
 
     /// Creates a piece from the corresponding character
     pub fn from_char(ch: char) -> Option<Self> {
@@ -59,6 +61,13 @@ impl Piece {
             'r' => Some(Piece::RookBlack),
             'q' => Some(Piece::QueenBlack),
             'k' => Some(Piece::KingBlack),
+            _ => None,
+        }
+    }
+
+    pub fn from_char_and_color(ch: char, color: Color) -> Option<Self> {
+        match ch {
+            'p' | 'P' => Some(Piece::BishopWhite),
             _ => None,
         }
     }
