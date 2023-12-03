@@ -9,6 +9,7 @@ pub enum Color {
     Black = 1,
 }
 
+/// Rank bitboards masks by index
 pub const RANKS: [u64; 8] = [
     0xff,
     0xff00,
@@ -20,14 +21,17 @@ pub const RANKS: [u64; 8] = [
     0xff00000000000000,
 ];
 
-pub const FILE_1: u64 = 0x0101010101010101;
-pub const FILE_2: u64 = 0x202020202020202;
-pub const FILE_3: u64 = 0x404040404040404;
-pub const FILE_4: u64 = 0x808080808080808;
-pub const FILE_5: u64 = 0x1010101010101010;
-pub const FILE_6: u64 = 0x2020202020202020;
-pub const FILE_7: u64 = 0x4040404040404040;
-pub const FILE_8: u64 = 0x8080808080808080;
+/// File bitboards masks by index
+pub const FILES: [u64; 8] = [
+    0x0101010101010101,
+    0x202020202020202,
+    0x404040404040404,
+    0x808080808080808,
+    0x1010101010101010,
+    0x2020202020202020,
+    0x4040404040404040,
+    0x8080808080808080,
+];
 
 pub const MAIN_DIAG: u64 = 0x8040201008040201;
 pub const ANTI_DIAG: u64 = 0x0102040810204080;
@@ -54,7 +58,7 @@ pub fn mask_rank(square: u8) -> Bitboard {
 
 /// Masks the file of a given square
 pub fn mask_file(square: u8) -> Bitboard {
-    FILE_1 << (square & 7)
+    FILES[0] << (square & 7)
 }
 
 /// Masks the diagonal of a given square
@@ -99,6 +103,7 @@ pub fn relative_rank(rank: u8, color: Color) -> Bitboard {
     }
 }
 
+/// Creates a bitboard from a square index
 pub fn bb_from_square(square: u8) -> Bitboard {
     1u64.checked_shl(square.into()).unwrap_or(0)
 }
@@ -121,6 +126,7 @@ pub fn mailbox_to_bb(mailbox: Squares, piece: Piece) -> Bitboard {
     bitboard
 }
 
+/// Checks if a square is on the board
 pub fn is_on_board(square: u8) -> bool {
     square < 64
 }

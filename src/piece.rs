@@ -19,10 +19,12 @@ impl Piece {
     pub const PIECE_CHARS: [char; 12] =
         ['P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k'];
 
+    /// Creates a piece from color and piece type
     pub fn new(color: Color, piece_type: PieceTypes) -> Self {
         Piece((color as u8) << 3 | piece_type.bits())
     }
 
+    /// Creates a piece from the char representation
     pub fn from_char(ch: char) -> Option<Self> {
         match ch {
             'P' => Some(Piece::new(Color::White, PieceTypes::PAWN)),
@@ -41,6 +43,7 @@ impl Piece {
         }
     }
 
+    /// Returns the color of the piece
     pub fn get_color(&self) -> Color {
         match self.0 >> 3 {
             0 => Color::White,
@@ -49,6 +52,7 @@ impl Piece {
         }
     }
 
+    /// Returns the index of the piece for access in array structures
     pub fn get_index(&self) -> usize {
         let piece_type = self.0 & 0b111;
         let color = self.get_color();

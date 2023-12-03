@@ -23,19 +23,23 @@ bitflags! {
 pub struct Move(u16);
 
 impl Move {
+    /// Create a move with from and target square and move flags
     pub fn new(from: u16, to: u16, flags: MoveFlags) -> Self {
         Move((from) | (to << 6) | (flags.bits() << 12))
     }
 
+    /// Returns the from square
     pub fn get_from(&self) -> u8 {
         (self.0 & 0x3F) as u8
     }
 
+    /// Returns the to square
     pub fn get_to(&self) -> u8 {
         ((self.0 >> 6) & 0x3F) as u8
     }
 
-    pub fn get_flags(&self) -> u8 {
+    /// Returns the move flag
+    pub fn get_flag(&self) -> u8 {
         ((self.0 >> 12) & 0xF) as u8
     }
 }

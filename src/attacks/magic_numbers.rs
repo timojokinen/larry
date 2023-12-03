@@ -2,7 +2,7 @@ use rand::Rng;
 
 use crate::{attacks::*, util::*};
 
-/// 
+/// Total number of attack permutations for bishops and rooks combined
 pub const SLIDER_TABLE_SIZE: usize = 107648;
 
 #[derive(Debug, Copy, Clone)]
@@ -13,7 +13,7 @@ pub struct Magic {
     pub(super) offset: usize,
 }
 
-/// Calculates a magic number
+/// Calculates a magic number and initializes the attack table
 pub fn init_magic(
     square: u8,
     bishop: bool,

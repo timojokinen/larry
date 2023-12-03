@@ -31,6 +31,7 @@ impl From<&str> for Position {
 }
 
 impl Position {
+    /// Generates all legal moves in the position
     pub fn generate_moves(&self) {
         let ally_color = self.board_state.1;
         let opp_color = opp(ally_color);
@@ -193,6 +194,7 @@ impl Position {
         });
     }
 
+    /// Creates a bitboard containing all the pieces from one color or both
     pub fn all_pieces_bb(&self, color: Option<Color>) -> Bitboard {
         match color {
             Some(Color::White) => {
