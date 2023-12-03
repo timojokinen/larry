@@ -3,7 +3,8 @@ use crate::{
         lookup_bishop_att, lookup_knight_att, lookup_pawn_att, lookup_queen_att, lookup_rook_att,
     },
     cmove::{Move, MoveFlags},
-    fen::{parse_fen, BoardState, Piece},
+    fen::{parse_fen, BoardState},
+    piece::{Piece, PieceTypes},
     util::{bb_from_square, enumerate_bits, mailbox_to_bb, opp, relative_rank, Bitboard, Color},
 };
 
@@ -39,15 +40,11 @@ impl Position {
         let all_pieces_bb = ally_pieces_bb | opp_pieces_bb;
         let mut moves: Vec<Move> = Vec::new();
 
-        let knight = if ally_color == Color::White {
-            Piece::KnightWhite
-        } else {
-            Piece::KnightBlack
-        };
+        let knight = Piece::new(ally_color, PieceTypes::KNIGHT);
 
         // Knight moves
         // TODO: Illegal moves
-        enumerate_bits(self.pieces[knight as usize], |from_sq| {
+        enumerate_bits(self.pieces[knight.get_index()], |from_sq| {
             let att = lookup_knight_att(from_sq) & !all_pieces_bb;
             let captures = att & opp_pieces_bb;
             let quiet = att & !opp_pieces_bb;
@@ -62,15 +59,11 @@ impl Position {
 
         // Pawn moves
         // TODO: illegal moves
-        let pawn = if ally_color == Color::White {
-            Piece::PawnWhite
-        } else {
-            Piece::PawnBlack
-        };
+        let pawn = Piece::new(ally_color, PieceTypes::PAWN);
         let pawn_direction: i8 = if ally_color == Color::White { 1 } else { -1 };
         let prom_rank = relative_rank(7, ally_color);
 
-        enumerate_bits(self.pieces[pawn as usize], |from_sq| {
+        enumerate_bits(self.pieces[pawn.get_index()], |from_sq| {
             let to_sq = (from_sq as i8 + 8 * pawn_direction) as u8;
             let to_bb = bb_from_square(to_sq);
             let from_bb = bb_from_square(from_sq);
@@ -151,14 +144,10 @@ impl Position {
             });
         });
 
-        let queen = if ally_color == Color::White {
-            Piece::QueenWhite
-        } else {
-            Piece::QueenBlack
-        };
+        let queen = Piece::new(ally_color, PieceTypes::QUEEN);
 
         // Queen moves
-        enumerate_bits(self.pieces[queen as usize], |from_sq| {
+        enumerate_bits(self.pieces[queen.get_index()], |from_sq| {
             let att = lookup_queen_att(from_sq, all_pieces_bb) & !ally_pieces_bb;
             let quiet = att & !opp_pieces_bb;
             let captures = att & opp_pieces_bb;
@@ -171,14 +160,10 @@ impl Position {
             });
         });
 
-        let bishop = if ally_color == Color::White {
-            Piece::BishopWhite
-        } else {
-            Piece::BishopBlack
-        };
+        let bishop = Piece::new(ally_color, PieceTypes::BISHOP);
 
         // Bishop moves
-        enumerate_bits(self.pieces[bishop as usize], |from_sq| {
+        enumerate_bits(self.pieces[bishop.get_index()], |from_sq| {
             let att = lookup_bishop_att(from_sq, all_pieces_bb) & !ally_pieces_bb;
             let quiet = att & !opp_pieces_bb;
             let captures = att & opp_pieces_bb;
@@ -191,14 +176,10 @@ impl Position {
             });
         });
 
-        let rook = if ally_color == Color::White {
-            Piece::RookWhite
-        } else {
-            Piece::RookBlack
-        };
+        let rook = Piece::new(ally_color, PieceTypes::ROOK);
 
         // Rook moves
-        enumerate_bits(self.pieces[rook as usize], |from_sq| {
+        enumerate_bits(self.pieces[rook.get_index()], |from_sq| {
             let att = lookup_rook_att(from_sq, all_pieces_bb) & !ally_pieces_bb;
             let quiet = att & !opp_pieces_bb;
             let captures = att & opp_pieces_bb;

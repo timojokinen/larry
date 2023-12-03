@@ -1,4 +1,4 @@
-use crate::{castling_rights::CastlingRights, util::Color};
+use crate::{castling_rights::CastlingRights, util::Color, piece::Piece};
 
 pub type Squares = [Option<Piece>; 64];
 pub type EnPassantSquare = Option<u8>;
@@ -20,55 +20,6 @@ impl From<usize> for Color {
             0 => Color::White,
             1 => Color::Black,
             _ => panic!("Invalid integer value for Color"),
-        }
-    }
-}
-
-/// Piece representation as integer
-#[derive(PartialEq, Copy, Clone)]
-#[repr(u8)]
-pub enum Piece {
-    PawnWhite = 0,
-    KnightWhite = 1,
-    BishopWhite = 2,
-    RookWhite = 3,
-    QueenWhite = 4,
-    KingWhite = 5,
-    PawnBlack = 6,
-    KnightBlack = 7,
-    BishopBlack = 8,
-    RookBlack = 9,
-    QueenBlack = 10,
-    KingBlack = 11,
-}
-
-impl Piece {
-    pub const PIECE_CHARS: [char; 12] =
-        ['P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k'];
-
-    /// Creates a piece from the corresponding character
-    pub fn from_char(ch: char) -> Option<Self> {
-        match ch {
-            'P' => Some(Piece::PawnWhite),
-            'N' => Some(Piece::KnightWhite),
-            'B' => Some(Piece::BishopWhite),
-            'R' => Some(Piece::RookWhite),
-            'Q' => Some(Piece::QueenWhite),
-            'K' => Some(Piece::KingWhite),
-            'p' => Some(Piece::PawnBlack),
-            'n' => Some(Piece::KnightBlack),
-            'b' => Some(Piece::BishopBlack),
-            'r' => Some(Piece::RookBlack),
-            'q' => Some(Piece::QueenBlack),
-            'k' => Some(Piece::KingBlack),
-            _ => None,
-        }
-    }
-
-    pub fn from_char_and_color(ch: char, color: Color) -> Option<Self> {
-        match ch {
-            'p' | 'P' => Some(Piece::BishopWhite),
-            _ => None,
         }
     }
 }
@@ -175,6 +126,8 @@ pub fn parse_fen(fen: &str) -> Result<BoardState, &str> {
 
 #[cfg(test)]
 mod tests {
+    use crate::piece::PieceTypes;
+
     use super::*;
 
     #[test]
@@ -194,10 +147,10 @@ mod tests {
             fullmove_number,
         ) = res;
 
-        assert!(mailbox[0] == Some(Piece::RookWhite));
-        assert!(mailbox[1] == Some(Piece::KnightWhite));
+        assert!(mailbox[0].unwrap() == Piece::new(Color::White, PieceTypes::ROOK));
+        assert!(mailbox[1].unwrap() == Piece::new(Color::White, PieceTypes::KNIGHT));
         assert!(mailbox[6] == None);
-        assert!(mailbox[63] == Some(Piece::RookBlack));
+        assert!(mailbox[63].unwrap() == Piece::new(Color::Black, PieceTypes::ROOK));
 
         assert!(active_color == Color::Black);
 

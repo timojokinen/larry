@@ -1,4 +1,4 @@
-use crate::fen::{Piece, Squares};
+use crate::{fen::Squares, piece::Piece};
 
 pub type Bitboard = u64;
 
